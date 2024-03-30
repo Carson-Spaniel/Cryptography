@@ -46,7 +46,6 @@ std::string encrypt(const std::string& ciphertext, const std::string& keyword){
 int main() {
     std::string plaintext = "This is my message to you";
     std::string keyword = "thisisapersonalkeyforyou";
-    int num = ' ';
 
     std::string encrypted = encrypt(plaintext, keyword);
     std::cout << "Encrypted message: " << encrypted << std::endl;
