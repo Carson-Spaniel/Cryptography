@@ -63,8 +63,8 @@ int main() {
 
     char bestCharacter;
     double bestScore = 1e5;
-    for (int i = 0; i < 26; i++) {
-        char c = i + 'A'; // Use 'A' as starting character
+    for (int i = 0; i < 256; i++) {
+        char c = i; // Use 'A' as starting character
 
         std::string xorString = XorAscii(encoded, c);
 
