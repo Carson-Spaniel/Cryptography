@@ -34,13 +34,13 @@ std::string base64_decode(const std::string &input) {
     return decoded;
 }
 
-std::unordered_map<char, double> frequencyTable = {
-    {'e', 12.70}, {'t', 9.06}, {'a', 8.17}, {'o', 7.51}, {'i', 6.97},
-    {'n', 6.75}, {'s', 6.33}, {'h', 6.09}, {'r', 5.99}, {'d', 4.25},
-    {'l', 4.03}, {'c', 2.78}, {'u', 2.76}, {'m', 2.41}, {'w', 2.36},
-    {'f', 2.23}, {'g', 2.02}, {'y', 1.97}, {'p', 1.93}, {'b', 1.29},
-    {'v', 0.98}, {'k', 0.77}, {'j', 0.15}, {'x', 0.15}, {'q', 0.10},
-    {'z', 0.07}
+const std::unordered_map<char, double> frequencyTable = {
+    {'a', 8.167}, {'b', 1.492}, {'c', 2.782}, {'d', 4.253}, {'e', 12.702},
+    {'f', 2.228}, {'g', 2.015}, {'h', 6.094}, {'i', 6.966}, {'j', 0.153},
+    {'k', 0.772}, {'l', 4.025}, {'m', 2.406}, {'n', 6.749}, {'o', 7.507},
+    {'p', 1.929}, {'q', 0.095}, {'r', 5.987}, {'s', 6.327}, {'t', 9.056},
+    {'u', 2.758}, {'v', 0.978}, {'w', 2.360}, {'x', 0.150}, {'y', 1.974},
+    {'z', 0.074}
 };
 
 double scoreText(const std::string& text) {
@@ -117,32 +117,27 @@ int calculateHammingDistance(const std::string& block1, const std::string& block
 
 int main() {
     std::ifstream file("file.txt");
-    std::string line;
+    
     std::cout << "Searching file..." << "\n\n";
-    std::vector<int> lengths = getKeyLength();
-    std::vector<std::vector<std::string>> blocks(lengths.back());
 
     std::string ciphertext;
+    std::string line;
     while (getline(file, line)) {
         ciphertext += line;
     }
 
     ciphertext = base64_decode(ciphertext);
 
-    std::cout << "Length: " << ciphertext.length() << "\n";
-
-    // std::cout << "Ciphertext: " << ciphertext << "\n\n";
+    std::vector<int> lengths = getKeyLength();
+    std::vector<std::vector<std::string>> blocks(lengths.back());
 
     int keyLenCandidate;
     double minNormalized = 1e6;
     for (int keyLength : lengths) {
-        // std::cout << "Key length: " << keyLength << "\n";
-
-        // Initialize variables for averaging
         double totalHammingDistance = 0;
         double totalNormalizedDistance = 0;
 
-        int numBlocks = ciphertext.length() / keyLength; // Number of complete blocks
+        int numBlocks = ciphertext.length() / keyLength;
         for (int i = 0; i < numBlocks - 1; i++) {
             std::string block1 = ciphertext.substr(i * keyLength, keyLength);
             std::string block2 = ciphertext.substr((i + 1) * keyLength, keyLength);
@@ -155,17 +150,10 @@ int main() {
 
             totalHammingDistance += hammingDistance;
             totalNormalizedDistance += normalizedDistance;
-
-            // std::cout << "Block " << i + 1 << " - Hamming distance: " << hammingDistance << "\n";
-            // std::cout << "Block " << i + 1 << " - Normalized distance: " << normalizedDistance << "\n";
         }
 
-        // Average the distances
         double averageHammingDistance = totalHammingDistance / (numBlocks - 1);
         double averageNormalizedDistance = totalNormalizedDistance / (numBlocks - 1);
-
-        // std::cout << "Average Hamming distance: " << averageHammingDistance << "\n";
-        // std::cout << "Average Normalized distance: " << averageNormalizedDistance << "\n\n";
 
         if (averageNormalizedDistance < minNormalized){
             keyLenCandidate = keyLength;
@@ -173,10 +161,9 @@ int main() {
         }
     }
 
-    std::cout << "Found Key length: " << keyLenCandidate << "\n";
-    std::cout << "Minimum Normalized distance: " << minNormalized << "\n\n";
+    std::cout << "Found Possible Key length: " << keyLenCandidate << "\n\n";
 
-    blocks.resize(keyLenCandidate); // Resize blocks to the correct size
+    blocks.resize(keyLenCandidate);
 
     for (int index = 0; index < ciphertext.length(); index += keyLenCandidate) {
         std::string block = ciphertext.substr(index, keyLenCandidate);
@@ -187,24 +174,22 @@ int main() {
             std::string hex;
             hex += hex1;
 
-            blocks[i].push_back(hex); // Append character to each block
+            blocks[i].push_back(hex);
         }
     }
 
     std::string key;
     for (int i = 0; i < blocks.size(); i++) {
-        // std::cout << "Block " << i << ": ";
         std::string block;
         for (int j = 0; j < blocks[i].size(); j++) {
             block += blocks[i][j];
         }
-        // std::cout << block << "\n\n";
 
         std::unordered_map<char, std::pair<double, std::string>> characterTable;
 
         char bestCharacter;
         double bestScore = 1e5;
-        for (int i = 0; i < 255; i++) {
+        for (int i = 0; i < 256; i++) {
             char c = i;
 
             std::string xorString = XorAscii(block, c);
@@ -218,27 +203,20 @@ int main() {
             }
 
         }
-        
-        std::cout << "Score: " << bestScore << "\n";
-        // std::cout << "Message: " << characterTable[bestCharacter].second << "\n";
-        std::cout << "Character: " << bestCharacter << "\n\n";
-
         key += bestCharacter;
-        // break;
+        std::cout << "Character: " << bestCharacter << "\n";
     }
 
     // key = "Terminator X: Bring the noise";
 
     std::cout << "\nKey: " << key << "\n";
 
-    // Decrypt the ciphertext using the key
     std::string decryptedMessage;
     for (int i = 0; i < ciphertext.length(); ++i) {
         char decryptedChar = char(ciphertext[i]) ^ char(key[i % key.length()]);
         decryptedMessage += decryptedChar;
     }
 
-    // Print the final decrypted message
     std::cout << "\nDecrypted Message: \n" << decryptedMessage << "\n";
 
     return 0;
