@@ -1,5 +1,6 @@
 {
   "files.associations": {
+    "*.py": "python",
     "array": "cpp",
     "atomic": "cpp",
     "bit": "cpp",
@@ -66,7 +67,15 @@
     "streambuf": "cpp",
     "thread": "cpp",
     "cinttypes": "cpp",
-    "typeinfo": "cpp"
+    "typeinfo": "cpp",
+    "csetjmp": "cpp",
+    "csignal": "cpp",
+    "cuchar": "cpp",
+    "forward_list": "cpp",
+    "scoped_allocator": "cpp",
+    "shared_mutex": "cpp",
+    "typeindex": "cpp",
+    "valarray": "cpp"
   },
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",

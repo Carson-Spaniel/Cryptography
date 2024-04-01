@@ -7,6 +7,33 @@
 #include <sstream>
 #include <iomanip>
 
+std::string base64_decode(const std::string &input) {
+    const std::string base64_chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz"
+        "0123456789+/";
+
+    std::vector<int> decoding_table(256, -1);
+    for (int i = 0; i < 64; ++i) {
+        decoding_table[base64_chars[i]] = i;
+    }
+
+    std::string decoded;
+    int val = 0, bits = -8;
+    for (char c : input) {
+        if (decoding_table[c] == -1) {
+            continue;
+        }
+        val = (val << 6) + decoding_table[c];
+        bits += 6;
+        if (bits >= 0) {
+            decoded.push_back(char((val >> bits) & 0xFF));
+            bits -= 8;
+        }
+    }
+    return decoded;
+}
+
 std::unordered_map<char, double> frequencyTable = {
     {'e', 12.70}, {'t', 9.06}, {'a', 8.17}, {'o', 7.51}, {'i', 6.97},
     {'n', 6.75}, {'s', 6.33}, {'h', 6.09}, {'r', 5.99}, {'d', 4.25},
@@ -17,14 +44,30 @@ std::unordered_map<char, double> frequencyTable = {
 };
 
 double scoreText(const std::string& text) {
-    double score = 0;
+    std::unordered_map<char, int> observedFreq;
+    bool space = false;
     for (char ch : text) {
-        if (!isalpha(ch) && !isspace(ch)) {
-            return 1e6;
+        if (int(ch) == 32){
+            space = true;
         }
-        else{
-            score++;
+
+        if(!space && (int(ch) > 126 || int(ch) < 32)) return 1e5;
+
+        if (isalpha(ch)) {
+            observedFreq[tolower(ch)]++;
         }
+    }
+
+    if (!space) return 1e5;
+
+    // Calculate Chi-Squared statistic
+    double score = 0.0;
+    for (const auto& pair : frequencyTable) {
+        char letter = pair.first;
+        double expectedFreq = pair.second;
+        double observedFreqLetter = observedFreq[letter];
+        double chi = pow(observedFreqLetter - expectedFreq, 2) / expectedFreq;
+        score += chi;
     }
 
     return score;
@@ -33,22 +76,8 @@ double scoreText(const std::string& text) {
 std::string XorAscii(std::string str, unsigned char ans) {
     std::string message;
 
-    // Loop through the string two characters at a time
-    for (size_t i = 0; i < str.length(); i += 2) {
-        // Extract two characters from the string
-        std::string hexByte = str.substr(i, 2);
-
-        // Convert hexByte to integer
-        std::stringstream ss;
-        ss << std::hex << hexByte;
-        int intValue;
-        ss >> intValue;
-
-        // XOR the integer value with 'ans'
-        char xorResult = ans ^ static_cast<unsigned char>(intValue);
-
-        // Append the XOR result to the message
-        message += xorResult;
+    for (int i=0; i<str.length();i++){
+        message += ans ^ str[i];
     }
 
     return message;
@@ -86,39 +115,6 @@ int calculateHammingDistance(const std::string& block1, const std::string& block
     return total;
 }
 
-std::string base64_decode(const std::string &in) {
-    std::string out;
-    std::vector<int> T(256, -1);
-    for (int i = 0; i < 64; i++) T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
-    int val = 0, valb = -8;
-    for (unsigned char c : in) {
-        if (T[c] == -1) break;
-        val = (val << 6) + T[c];
-        valb += 6;
-        if (valb >= 0) {
-            out.push_back(char((val >> valb) & 0xFF));
-            valb -= 8;
-        }
-    }
-    return out;
-}
-
-// Function to convert binary to hex
-std::string bin2hex(const std::string &bin) {
-    std::ostringstream oss;
-    oss << std::hex << std::setfill('0');
-    for (unsigned char c : bin) {
-        oss << std::setw(2) << (int)c;
-    }
-    return oss.str();
-}
-
-// Function to convert Base64 to hex
-std::string base64_to_hex(const std::string &base64_str) {
-    std::string decoded = base64_decode(base64_str);
-    return bin2hex(decoded);
-}
-
 int main() {
     std::ifstream file("file.txt");
     std::string line;
@@ -131,7 +127,9 @@ int main() {
         ciphertext += line;
     }
 
-    ciphertext = base64_to_hex(ciphertext);
+    ciphertext = base64_decode(ciphertext);
+
+    std::cout << "Length: " << ciphertext.length() << "\n";
 
     // std::cout << "Ciphertext: " << ciphertext << "\n\n";
 
@@ -183,62 +181,65 @@ int main() {
     for (int index = 0; index < ciphertext.length(); index += keyLenCandidate) {
         std::string block = ciphertext.substr(index, keyLenCandidate);
 
-        for (int i = 0; i < keyLenCandidate; i+=2) {
+        for (int i = 0; i < keyLenCandidate; i++){
             char hex1 = block[i];
-            char hex2 = block[i+1];
 
             std::string hex;
             hex += hex1;
-            hex += hex2;
-            
+
             blocks[i].push_back(hex); // Append character to each block
         }
     }
 
     std::string key;
     for (int i = 0; i < blocks.size(); i++) {
-        std::cout << "Block " << i << ": ";
+        // std::cout << "Block " << i << ": ";
         std::string block;
         for (int j = 0; j < blocks[i].size(); j++) {
             block += blocks[i][j];
         }
-        std::cout << block << "\n\n";
+        // std::cout << block << "\n\n";
 
         std::unordered_map<char, std::pair<double, std::string>> characterTable;
 
         char bestCharacter;
-        double bestScore = 0;
-        for (int i = 0; i < 95; i++) {
-            char c = i + ' ';
+        double bestScore = 1e5;
+        for (int i = 0; i < 255; i++) {
+            char c = i;
 
             std::string xorString = XorAscii(block, c);
 
             double score = scoreText(xorString);
             characterTable[c] = std::make_pair(score, xorString);
 
-            if (characterTable[c].first > bestScore) {
+            if (characterTable[c].first < bestScore) {
                 bestScore = characterTable[c].first;
                 bestCharacter = c;
             }
+
         }
-        std::cout << bestScore << "\n";
+        
+        std::cout << "Score: " << bestScore << "\n";
+        // std::cout << "Message: " << characterTable[bestCharacter].second << "\n";
+        std::cout << "Character: " << bestCharacter << "\n\n";
 
         key += bestCharacter;
+        // break;
     }
 
     // key = "Terminator X: Bring the noise";
 
-    std::cout << "Key: " << key << "\n";
+    std::cout << "\nKey: " << key << "\n";
 
     // Decrypt the ciphertext using the key
     std::string decryptedMessage;
     for (int i = 0; i < ciphertext.length(); ++i) {
-        char decryptedChar = ciphertext[i] ^ key[i % key.length()];
+        char decryptedChar = char(ciphertext[i]) ^ char(key[i % key.length()]);
         decryptedMessage += decryptedChar;
     }
 
     // Print the final decrypted message
-    std::cout << "Decrypted Message: " << decryptedMessage << "\n";
+    std::cout << "\nDecrypted Message: \n" << decryptedMessage << "\n";
 
     return 0;
 }
