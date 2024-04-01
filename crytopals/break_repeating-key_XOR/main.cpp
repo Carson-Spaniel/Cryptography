@@ -58,7 +58,7 @@ double scoreText(const std::string& text) {
         }
     }
 
-    if (!space) return 1e5;
+    // if (!space) return 1e5;
 
     // Calculate Chi-Squared statistic
     double score = 0.0;
@@ -205,6 +205,8 @@ int main() {
         }
         key += bestCharacter;
         std::cout << "Character: " << bestCharacter << "\n";
+        // std::cout << "Message: " << characterTable[bestCharacter].second << "\n";
+        // std::cout << "Score: " << bestScore << "\n";
     }
 
     // key = "Terminator X: Bring the noise";
