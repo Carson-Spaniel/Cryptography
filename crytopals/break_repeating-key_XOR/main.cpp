@@ -2,6 +2,57 @@
 #include <vector>
 #include <fstream>
 #include <bitset>
+#include <unordered_map>
+#include <cmath>
+#include <sstream>
+#include <iomanip>
+
+std::unordered_map<char, double> frequencyTable = {
+    {'e', 12.70}, {'t', 9.06}, {'a', 8.17}, {'o', 7.51}, {'i', 6.97},
+    {'n', 6.75}, {'s', 6.33}, {'h', 6.09}, {'r', 5.99}, {'d', 4.25},
+    {'l', 4.03}, {'c', 2.78}, {'u', 2.76}, {'m', 2.41}, {'w', 2.36},
+    {'f', 2.23}, {'g', 2.02}, {'y', 1.97}, {'p', 1.93}, {'b', 1.29},
+    {'v', 0.98}, {'k', 0.77}, {'j', 0.15}, {'x', 0.15}, {'q', 0.10},
+    {'z', 0.07}
+};
+
+double scoreText(const std::string& text) {
+    double score = 0;
+    for (char ch : text) {
+        if (!isalpha(ch) && !isspace(ch)) {
+            return 1e6;
+        }
+        else{
+            score++;
+        }
+    }
+
+    return score;
+}
+
+std::string XorAscii(std::string str, unsigned char ans) {
+    std::string message;
+
+    // Loop through the string two characters at a time
+    for (size_t i = 0; i < str.length(); i += 2) {
+        // Extract two characters from the string
+        std::string hexByte = str.substr(i, 2);
+
+        // Convert hexByte to integer
+        std::stringstream ss;
+        ss << std::hex << hexByte;
+        int intValue;
+        ss >> intValue;
+
+        // XOR the integer value with 'ans'
+        char xorResult = ans ^ static_cast<unsigned char>(intValue);
+
+        // Append the XOR result to the message
+        message += xorResult;
+    }
+
+    return message;
+}
 
 std::vector<int> getKeyLength() {
     std::vector<int> lengths;
@@ -9,45 +60,6 @@ std::vector<int> getKeyLength() {
         lengths.push_back(i);
     }
     return lengths;
-}
-
-std::string base64_to_ascii(const std::string& base64_string) {
-    // Base64 characters
-    const std::string base64_chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz"
-        "0123456789+/";
-
-    std::string ascii_result = "";
-    size_t in_len = base64_string.size();
-    int i = 0;
-    int bit_count = 0;
-    unsigned int bits = 0;
-
-    for (char c : base64_string) {
-        // Ignore padding '=' characters
-        if (c == '=') {
-            break;
-        }
-        
-        // Find the index of the current character in the base64_chars
-        size_t index = base64_chars.find(c);
-        if (index != std::string::npos) {
-            bits = (bits << 6) | index;
-            bit_count += 6;
-
-            // If we have 8 or more bits accumulated, convert to ASCII
-            if (bit_count >= 8) {
-                bit_count -= 8;
-                ascii_result += static_cast<char>((bits >> bit_count) & 0xFF);
-            }
-        } else {
-            std::cerr << "Invalid Base64 character: " << c << std::endl;
-            return "";  // Return empty string on error
-        }
-    }
-
-    return ascii_result;
 }
 
 std::string ascii_to_binary(const std::string& text) {
@@ -74,6 +86,38 @@ int calculateHammingDistance(const std::string& block1, const std::string& block
     return total;
 }
 
+std::string base64_decode(const std::string &in) {
+    std::string out;
+    std::vector<int> T(256, -1);
+    for (int i = 0; i < 64; i++) T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
+    int val = 0, valb = -8;
+    for (unsigned char c : in) {
+        if (T[c] == -1) break;
+        val = (val << 6) + T[c];
+        valb += 6;
+        if (valb >= 0) {
+            out.push_back(char((val >> valb) & 0xFF));
+            valb -= 8;
+        }
+    }
+    return out;
+}
+
+// Function to convert binary to hex
+std::string bin2hex(const std::string &bin) {
+    std::ostringstream oss;
+    oss << std::hex << std::setfill('0');
+    for (unsigned char c : bin) {
+        oss << std::setw(2) << (int)c;
+    }
+    return oss.str();
+}
+
+// Function to convert Base64 to hex
+std::string base64_to_hex(const std::string &base64_str) {
+    std::string decoded = base64_decode(base64_str);
+    return bin2hex(decoded);
+}
 
 int main() {
     std::ifstream file("file.txt");
@@ -81,69 +125,120 @@ int main() {
     std::cout << "Searching file..." << "\n\n";
     std::vector<int> lengths = getKeyLength();
     std::vector<std::vector<std::string>> blocks(lengths.back());
+
+    std::string ciphertext;
     while (getline(file, line)) {
-        int keyLenCandidate;
-        double minNormalized = 1e6;
-        for (int keyLength : lengths) {
-            // std::cout << "Key length: " << keyLength << "\n";
-
-            // Initialize variables for averaging
-            double totalHammingDistance = 0;
-            double totalNormalizedDistance = 0;
-
-            int numBlocks = line.length() / keyLength; // Number of complete blocks
-            for (int i = 0; i < numBlocks - 1; i++) {
-                std::string block1 = line.substr(i * keyLength, keyLength);
-                std::string block2 = line.substr((i + 1) * keyLength, keyLength);
-
-                std::string blockBinary = ascii_to_binary(block1);
-                std::string blockBinary2 = ascii_to_binary(block2);
-
-                int hammingDistance = calculateHammingDistance(blockBinary, blockBinary2);
-                double normalizedDistance = static_cast<double>(hammingDistance) / keyLength;
-
-                totalHammingDistance += hammingDistance;
-                totalNormalizedDistance += normalizedDistance;
-
-                // std::cout << "Block " << i + 1 << " - Hamming distance: " << hammingDistance << "\n";
-                // std::cout << "Block " << i + 1 << " - Normalized distance: " << normalizedDistance << "\n";
-            }
-
-            // Average the distances
-            double averageHammingDistance = totalHammingDistance / (numBlocks - 1);
-            double averageNormalizedDistance = totalNormalizedDistance / (numBlocks - 1);
-
-            // std::cout << "Average Hamming distance: " << averageHammingDistance << "\n";
-            // std::cout << "Average Normalized distance: " << averageNormalizedDistance << "\n\n";
-
-            if (averageNormalizedDistance < minNormalized){
-                keyLenCandidate = keyLength;
-                minNormalized = averageNormalizedDistance;
-            }
-        }
-
-        std::cout << "Found Key length: " << keyLenCandidate << "\n";
-        std::cout << "Minimum Normalized distance: " << minNormalized << "\n\n";
-
-        blocks.resize(keyLenCandidate); // Resize blocks to the correct size
-
-        for (int index = 0; index < line.length(); index += keyLenCandidate) {
-            std::string block = line.substr(index, keyLenCandidate);
-
-            for (int i = 0; i < keyLenCandidate; i++) {
-                blocks[i].push_back(std::string(1, block[i])); // Append character to each block
-            }
-        }
-
-        for (int i = 0; i < blocks.size(); i++) {
-            std::cout << "Section " << i << ": ";
-            for (int j = 0; j < blocks[i].size(); j++) {
-                std::cout << blocks[i][j];
-            }
-            std::cout << "\n";
-        }
-
-        break;
+        ciphertext += line;
     }
+
+    ciphertext = base64_to_hex(ciphertext);
+
+    // std::cout << "Ciphertext: " << ciphertext << "\n\n";
+
+    int keyLenCandidate;
+    double minNormalized = 1e6;
+    for (int keyLength : lengths) {
+        // std::cout << "Key length: " << keyLength << "\n";
+
+        // Initialize variables for averaging
+        double totalHammingDistance = 0;
+        double totalNormalizedDistance = 0;
+
+        int numBlocks = ciphertext.length() / keyLength; // Number of complete blocks
+        for (int i = 0; i < numBlocks - 1; i++) {
+            std::string block1 = ciphertext.substr(i * keyLength, keyLength);
+            std::string block2 = ciphertext.substr((i + 1) * keyLength, keyLength);
+
+            std::string blockBinary = ascii_to_binary(block1);
+            std::string blockBinary2 = ascii_to_binary(block2);
+
+            int hammingDistance = calculateHammingDistance(blockBinary, blockBinary2);
+            double normalizedDistance = static_cast<double>(hammingDistance) / keyLength;
+
+            totalHammingDistance += hammingDistance;
+            totalNormalizedDistance += normalizedDistance;
+
+            // std::cout << "Block " << i + 1 << " - Hamming distance: " << hammingDistance << "\n";
+            // std::cout << "Block " << i + 1 << " - Normalized distance: " << normalizedDistance << "\n";
+        }
+
+        // Average the distances
+        double averageHammingDistance = totalHammingDistance / (numBlocks - 1);
+        double averageNormalizedDistance = totalNormalizedDistance / (numBlocks - 1);
+
+        // std::cout << "Average Hamming distance: " << averageHammingDistance << "\n";
+        // std::cout << "Average Normalized distance: " << averageNormalizedDistance << "\n\n";
+
+        if (averageNormalizedDistance < minNormalized){
+            keyLenCandidate = keyLength;
+            minNormalized = averageNormalizedDistance;
+        }
+    }
+
+    std::cout << "Found Key length: " << keyLenCandidate << "\n";
+    std::cout << "Minimum Normalized distance: " << minNormalized << "\n\n";
+
+    blocks.resize(keyLenCandidate); // Resize blocks to the correct size
+
+    for (int index = 0; index < ciphertext.length(); index += keyLenCandidate) {
+        std::string block = ciphertext.substr(index, keyLenCandidate);
+
+        for (int i = 0; i < keyLenCandidate; i+=2) {
+            char hex1 = block[i];
+            char hex2 = block[i+1];
+
+            std::string hex;
+            hex += hex1;
+            hex += hex2;
+            
+            blocks[i].push_back(hex); // Append character to each block
+        }
+    }
+
+    std::string key;
+    for (int i = 0; i < blocks.size(); i++) {
+        std::cout << "Block " << i << ": ";
+        std::string block;
+        for (int j = 0; j < blocks[i].size(); j++) {
+            block += blocks[i][j];
+        }
+        std::cout << block << "\n\n";
+
+        std::unordered_map<char, std::pair<double, std::string>> characterTable;
+
+        char bestCharacter;
+        double bestScore = 0;
+        for (int i = 0; i < 95; i++) {
+            char c = i + ' ';
+
+            std::string xorString = XorAscii(block, c);
+
+            double score = scoreText(xorString);
+            characterTable[c] = std::make_pair(score, xorString);
+
+            if (characterTable[c].first > bestScore) {
+                bestScore = characterTable[c].first;
+                bestCharacter = c;
+            }
+        }
+        std::cout << bestScore << "\n";
+
+        key += bestCharacter;
+    }
+
+    // key = "Terminator X: Bring the noise";
+
+    std::cout << "Key: " << key << "\n";
+
+    // Decrypt the ciphertext using the key
+    std::string decryptedMessage;
+    for (int i = 0; i < ciphertext.length(); ++i) {
+        char decryptedChar = ciphertext[i] ^ key[i % key.length()];
+        decryptedMessage += decryptedChar;
+    }
+
+    // Print the final decrypted message
+    std::cout << "Decrypted Message: " << decryptedMessage << "\n";
+
     return 0;
 }
