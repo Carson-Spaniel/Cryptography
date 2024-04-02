@@ -58,8 +58,6 @@ double scoreText(const std::string& text) {
         }
     }
 
-    // if (!space) return 1e5;
-
     // Calculate Chi-Squared statistic
     double score = 0.0;
     for (const auto& pair : frequencyTable) {
