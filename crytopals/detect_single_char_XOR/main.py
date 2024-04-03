@@ -17,6 +17,9 @@ def xorAscii(hex_string, key):
 def scoreText(s):
     observedFreq = {}
     for letter in s:
+        if not letter.isalpha() and not letter.isspace():
+            return 1e5
+        
         if letter.isalpha():
             if letter.upper() in observedFreq:
                 observedFreq[letter.upper()] += 1
@@ -33,18 +36,34 @@ def scoreText(s):
 
     return score
 
-encoded = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
-bestCharacter = ''
-bestScore = 1e5
-bestMessage = ''
-for i in range(256):
-    xorString = xorAscii(encoded, i)
-    score = scoreText(xorString)
+print("Searching file...")
 
-    if score < bestScore:
-        bestScore = score
-        bestCharacter = chr(i)
-        bestMessage = xorString
+overallBestCharacter = ''
+overallBestScore = 1e5
+overallBestMessage = ''
 
-print(f'Found character: {bestCharacter}')
-print(f'Message reads: {bestMessage}')
+with open('file.txt', 'r') as file:
+    for line in file:
+        line = line.strip()
+        bestCharacter = ''
+        bestScore = 1e5
+        bestMessage = ''
+        for i in range(94):
+            xorString = xorAscii(line, i)
+            score = scoreText(xorString)
+
+            if score < bestScore:
+                bestScore = score
+                bestCharacter = chr(i)
+                bestMessage = xorString
+
+            if score < overallBestScore:
+                overallBestScore = score
+                overallBestCharacter = chr(i)
+                overallBestMessage = xorString
+
+        # print(f'Found character: {bestCharacter}')
+        # print(f'Message reads: {bestMessage}')
+
+print("Overall Best Character:", overallBestCharacter)
+print("Overall Best Message:", overallBestMessage)
