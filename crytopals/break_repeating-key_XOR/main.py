@@ -103,7 +103,7 @@ for i in range(len(blocks)):
     for j in range(len(blocks)):
         block += blocks[i][j]
 
-    bestCharacter = ' '
+    bestCharacter = '_'
     bestScore = 1e5
     bestMessage = ''
     for i in range(256):
