@@ -1,4 +1,5 @@
 import base64
+import string
 
 letterFrequency = {
     'E': 12.70, 'T': 9.06, 'A': 8.17, 'O': 7.51, 'I': 6.97, 'N': 6.75,
@@ -16,27 +17,20 @@ def xorAscii(string, key):
         message += chr(strChar ^ keyChar)
     return message
 
-def scoreText(s):
-    observedFreq = {}
-    for letter in s:
-        if not letter.isalpha() and not letter.isspace():
-            return 1e5
+def scoreText(data):    
+    s = 0
+    data = data.lower()
+    common = "etaoin shrdlu"[::-1]
+    
+    for c in data:
+        if c not in string.printable:
+            return 0
         
-        if letter.isalpha():
-            if letter.upper() in observedFreq:
-                observedFreq[letter.upper()] += 1
-            else:
-                observedFreq[letter.upper()] = 1
-
-    score = 0.0
-    for key in letterFrequency:
-        letter = key
-        expectedFreq = letterFrequency[key]
-        observedFreqLetter = observedFreq.get(letter.upper(), 0)
-        chi = pow(observedFreqLetter - expectedFreq, 2) / expectedFreq
-        score += chi
-
-    return score
+        i = common.find(c)
+        if i != -1:
+            s += i
+    
+    return s
 
 def getKeyLengths():
     return [length for length in range(2,41)]
@@ -104,13 +98,13 @@ for i in range(len(blocks)):
         block += blocks[i][j]
 
     bestCharacter = '_'
-    bestScore = 1e5
+    bestScore = 0
     bestMessage = ''
     for i in range(256):
         xorString = xorAscii(block, i)
         score = scoreText(xorString)
 
-        if score < bestScore:
+        if score > bestScore:
             bestScore = score
             bestCharacter = chr(i)
             bestMessage = xorString
