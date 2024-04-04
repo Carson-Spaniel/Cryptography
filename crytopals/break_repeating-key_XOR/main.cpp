@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <cmath>
 #include <sstream>
-#include <iomanip>
 
 std::string base64_decode(const std::string &input) {
     const std::string base64_chars =
