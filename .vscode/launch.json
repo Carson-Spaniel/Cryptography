@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/carso/Github/Cryptography/crytopals/break_repeating-key_XOR",
-      "program": "c:/Users/carso/Github/Cryptography/crytopals/break_repeating-key_XOR/build/Debug/outDebug",
+      "cwd": "c:/Users/carso/Github/Cryptography/Ciphers",
+      "program": "c:/Users/carso/Github/Cryptography/Ciphers/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

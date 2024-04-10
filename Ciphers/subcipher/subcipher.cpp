@@ -23,8 +23,8 @@ std::string decrypt(const std::string& ciphertext, const std::string& keyword) {
     return decrypted;
 }
 
-std::string encrypt(const std::string& ciphertext, const std::string& keyword){
-    std::string encrypted = ciphertext;
+std::string encrypt(const std::string& plaintext, const std::string& keyword){
+    std::string encrypted = plaintext;
     int keyLen = keyword.length();
     int textLen = encrypted.length();
 
