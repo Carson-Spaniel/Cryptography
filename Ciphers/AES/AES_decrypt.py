@@ -16,8 +16,8 @@ with open("encrypted.bin", "rb") as f:
 cipher = AES.new(aes_key, AES.MODE_OCB, nonce=nonce)
 try:
     message = cipher.decrypt_and_verify(ciphertext, tag)
-    with open(f"decrypted_file{file_extension}", "w") as f:
-        f.write(message.decode())
+    with open(f"decrypted_file{file_extension}", "wb") as f:
+        f.write(message)
 except ValueError:
     print("The message was modified!")
     exit(1)
