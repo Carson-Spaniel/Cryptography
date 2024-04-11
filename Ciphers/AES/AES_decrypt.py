@@ -43,9 +43,9 @@ def decrypt_file(file_path, aes_key):
         decrypted_file_path = os.path.join(decrypted_dir, os.path.basename(file_path) + file_extension)
         with open(decrypted_file_path, "wb") as f:
             f.write(message)
-        print(f"Decrypted '{file_path}_encrypted.bin'")
+        print(f"\033[32mDecrypted '{file_path}_encrypted.bin'\033[0m")
     except ValueError:
-        print(f"Failed to decrypt '{file_path}_encrypted.bin'")
+        print(f"\033[31mFailed to decrypt '{file_path}_encrypted.bin'\033[0m")
         
 def decrypt_folder(folder_path, aes_key):
     for root, _, files in os.walk(folder_path):
@@ -69,7 +69,7 @@ def main():
         with open(sys.argv[2], 'rb') as f:
             aes_key = f.read()
     else:
-        print("Usage: \n\tpy AES_decrypt.py <file_or_folder_path> <key_file> or\n\tpy AES_decrypt.py <file_or_folder_path>")
+        print("Usage: \n\t\033[33mpy\033[0m AES_decrypt.py \033[34m<file_or_folder_path> <key_file>\033[0m or\n\t\033[33mpy\033[0m AES_decrypt.py \033[34m<file_or_folder_path> \033[32m(enter password)\033[0m")
         sys.exit(1)
 
     path = sys.argv[1]

@@ -48,9 +48,6 @@ def encrypt_file(file_path, encrypt_dir, aes_key):
         f.write(cipher.nonce)
         f.write(ciphertext)
 
-    with open(f"key.bin", "wb") as f:
-        f.write(aes_key)
-
     print(f'Encrypted {file_info[0]}{file_info[1]}')
 
 def encrypt_folder(folder_path, encrypt_dir, key_path):
@@ -75,20 +72,24 @@ def main():
         with open(sys.argv[2], 'rb') as f:
             aes_key = f.read()
     else:
-        print("Usage: \n\tpy AES_encrypt.py <file_or_folder_path> <key_file> or\n\tpy AES_encrypt.py <file_or_folder_path>")
+        print("Usage: \n\t\033[33mpy\033[0m AES_encrypt.py \033[34m<file_or_folder_path> <key_file>\033[0m or\n\t\033[33mpy\033[0m AES_encrypt.py \033[34m<file_or_folder_path> \033[32m(custom key generation)\033[0m")
         sys.exit(1)
 
     path = sys.argv[1]
-    encrypt_dir = './Encrypted/'
+    encrypt_dir = 'Encrypted'
+
+    with open(f"key.bin", "wb") as f:
+        f.write(aes_key)
+        print(f"\n\033[31mKey created. Don't forget to save it or delete it!\nLocated at: '{os.path.abspath('key.bin')}'\033[0m\n")
 
     if os.path.isfile(path):
         # Encrypt a single file
         encrypt_file(path, encrypt_dir, aes_key)
-        print(f"File '{path}' encrypted.")
+        print(f"\n\033[32mFile '{path}' encrypted.\033[0m")
     elif os.path.isdir(path):
         # Encrypt all files in a folder
         encrypt_folder(path, encrypt_dir, aes_key)
-        print(f"All files in folder '{path}' encrypted and saved in '{encrypt_dir}'.")
+        print(f"\n\033[32mAll files in folder '{path}' encrypted and saved in '{encrypt_dir}'.\033[0m")
     else:
         print(f"Error: '{path}' is not a valid file or folder.")
         sys.exit(1)
