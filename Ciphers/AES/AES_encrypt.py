@@ -22,7 +22,7 @@ def encrypt_file(file_path, encrypt_dir, key_path):
     file_info = os.path.splitext(file_path)
     file_name = file_info[0].split('\\')[-1]
     file_extension = file_info[1]
-    file_extension_xor = ''.join(chr(ord(file_extension[i]) ^ aes_key[i % 16]) for i in range(len(file_extension)))
+    file_extension_xor = ''.join(chr(ord(file_extension[i]) ^ aes_key[i % len(aes_key)]) for i in range(len(file_extension)))
 
     file_ext = pkcs_7(file_extension_xor.encode(), 16)
     

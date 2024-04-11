@@ -16,12 +16,8 @@ def unpkcs_7(padded_text):
 def decrypt_file(file_path, key_path):
     key_file = key_path
 
-    if not os.path.exists(key_file):
-        print(f"Key file '{key_file}' not found. Skipping decryption for '{file_path}'")
-        return
-
     with open(key_file, "rb") as f:
-        aes_key = f.read(16)
+        aes_key = f.read(32)
 
     encrypted_file = file_path + "_encrypted.bin"
 
@@ -33,7 +29,7 @@ def decrypt_file(file_path, key_path):
 
     file_type_xor = unpkcs_7(file_type_xor).decode()
 
-    file_extension = ''.join(chr(ord(file_type_xor[i]) ^ aes_key[i % 16]) for i in range(len(file_type_xor)))
+    file_extension = ''.join(chr(ord(file_type_xor[i]) ^ aes_key[i % len(aes_key)]) for i in range(len(file_type_xor)))
     cipher = AES.new(aes_key, AES.MODE_OCB, nonce=nonce)
 
     try:
@@ -61,13 +57,18 @@ def main():
         sys.exit(1)
 
     path = sys.argv[1]
+    key_file = sys.argv[2]
+
+    if not os.path.exists(key_file):
+        print(f"Key file '{key_file}' not found.")
+        sys.exit(1)
 
     if os.path.isfile(path):
         # Decrypt a single file
-        decrypt_file(os.path.splitext(path)[0], sys.argv[2])
+        decrypt_file(os.path.splitext(path)[0], )
     elif os.path.isdir(path):
         # Decrypt all files in a folder
-        decrypt_folder(path, sys.argv[2])
+        decrypt_folder(path, key_file)
     else:
         print(f"Error: '{path}' is not a valid file or folder.")
         sys.exit(1)
