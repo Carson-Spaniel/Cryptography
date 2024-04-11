@@ -30,7 +30,10 @@ def decrypt_file(file_path, aes_key):
         nonce = f.read(15)
         ciphertext = f.read()
 
-    file_type_xor = unpkcs_7(file_type_xor).decode()
+    try:
+        file_type_xor = unpkcs_7(file_type_xor).decode()
+    except ValueError:
+        return
 
     file_extension = ''.join(chr(ord(file_type_xor[i]) ^ aes_key[i % len(aes_key)]) for i in range(len(file_type_xor)))
     cipher = AES.new(aes_key, AES.MODE_OCB, nonce=nonce)
@@ -43,7 +46,7 @@ def decrypt_file(file_path, aes_key):
         decrypted_file_path = os.path.join(decrypted_dir, os.path.basename(file_path) + file_extension)
         with open(decrypted_file_path, "wb") as f:
             f.write(message)
-        print(f"\033[32mDecrypted '{file_path}_encrypted.bin'\033[0m")
+        print(f"Decrypted '{file_path}_encrypted.bin'")
     except ValueError:
         print(f"\033[31mFailed to decrypt '{file_path}_encrypted.bin'\033[0m")
         
@@ -77,9 +80,11 @@ def main():
     if os.path.isfile(path):
         # Decrypt a single file
         decrypt_file(os.path.splitext(path)[0].replace("_encrypted", ""), aes_key)
+        print(f"\n\033[32mFile '{path}' decrypted.\033[0m")
     elif os.path.isdir(path):
         # Decrypt all files in a folder
         decrypt_folder(path, aes_key)
+        print(f"\n\033[32mAll files in folder '{path}' decrypted and saved in 'Decrypted'.\033[0m")
     else:
         print(f"Error: '{path}' is not a valid file or folder.")
         sys.exit(1)
