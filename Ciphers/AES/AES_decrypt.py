@@ -53,7 +53,7 @@ def decrypt_folder(folder_path, key_path):
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: py AES_decrypt.py <folder_path> <key_path>")
+        print("Usage: py AES_decrypt.py <folder_path> <key_file>")
         sys.exit(1)
 
     path = sys.argv[1]
@@ -65,7 +65,7 @@ def main():
 
     if os.path.isfile(path):
         # Decrypt a single file
-        decrypt_file(os.path.splitext(path)[0], )
+        decrypt_file(os.path.splitext(path)[0].replace("_encrypted", ""), key_file)
     elif os.path.isdir(path):
         # Decrypt all files in a folder
         decrypt_folder(path, key_file)
