@@ -43,7 +43,7 @@ def decrypt_file(file_path, aes_key):
         decrypted_dir = "Decrypted"
         if not os.path.exists(decrypted_dir):
             os.makedirs(decrypted_dir)
-        decrypted_file_path = os.path.join(decrypted_dir, os.path.basename(file_path)) #  + file_extension
+        decrypted_file_path = os.path.join(decrypted_dir, os.path.basename(file_path) + file_extension)
         with open(decrypted_file_path, "wb") as f:
             f.write(message)
         print(f"Decrypted '{file_path}_encrypted.bin'")
