@@ -34,7 +34,7 @@ def decrypt_file(file_path, aes_key):
         file_type_xor = unpkcs_7(file_type_xor).decode()
     except ValueError:
         return
-
+    
     file_extension = ''.join(chr(ord(file_type_xor[i]) ^ aes_key[i % len(aes_key)]) for i in range(len(file_type_xor)))
     cipher = AES.new(aes_key, AES.MODE_OCB, nonce=nonce)
 
