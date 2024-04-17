@@ -35,7 +35,6 @@ def play_game(quote, author, category):
         print(f"Incorrect characters:\n{characterAttempted}\n")
         print(f"Correct characters:\n{correctCharacters}\n")
 
-
         character = input("Enter a single letter guess (or 'exit' to quit): ").upper()
         
         if character == 'EXIT':
