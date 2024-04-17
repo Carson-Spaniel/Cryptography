@@ -38,7 +38,7 @@ def play_game(quote, author, category):
         character = input("Enter a single letter guess (or 'exit' to quit): ").upper()
         
         if character == 'EXIT':
-            print("Quitting game...")
+            print("Quitting game...\n")
             break
         
         if len(character) != 1 or not character.isalpha():
