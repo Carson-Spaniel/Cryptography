@@ -28,6 +28,7 @@ def run_server():
         conn.sendall(ciphertext)
 
         conn.close()
+        return
 
 if __name__ == "__main__":
     run_server()
