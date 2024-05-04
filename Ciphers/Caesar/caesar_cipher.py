@@ -70,7 +70,7 @@ def caesarBreaker(cipherText):
     return bestMessage
 
         
-plainText = "hello my name is carson."
+plainText = "hello my name is carson." # Works better with longer plain texts
 cipherText = caesarCipher(plainText,1)
 foundPlainText = caesarBreaker(cipherText)
 
