@@ -13,7 +13,7 @@ std::string decrypt(const std::string& ciphertext, const std::string& keyword) {
         int keyIndex = i % keyLen; // Handle repeating keyword
         int num1 = decrypted[i];
         int num2 = keyword[keyIndex];
-        characters[i] = 156 + ((int(decrypted[i]) - int(keyword[keyIndex]))); // Ensure result is in ASCII range
+        characters[i] = 157 + ((int(decrypted[i]) - int(keyword[keyIndex]))); // Ensure result is in ASCII range
     }
 
     for (int i = 0; i < textLen; i++) {
@@ -32,7 +32,7 @@ std::string encrypt(const std::string& plaintext, const std::string& keyword){
 
     for (int i = 0; i < textLen; i++) {
         int keyIndex = i % keyLen; // Handle repeating keyword
-        characters[i] = (int(encrypted[i]) + int(keyword[keyIndex])) % 94 + 32; // Ensure result is in ASCII range
+        characters[i] = (int(encrypted[i]) + int(keyword[keyIndex])) % 94 + 31; // Ensure result is in ASCII range
     }
 
 
