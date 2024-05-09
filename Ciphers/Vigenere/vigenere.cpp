@@ -39,6 +39,8 @@ string originalText(string ciphertext, string key) {
     return orig_text;
 }
 
+
+
 /* Functions to break Vigenere */
 
 int calculateHammingDistance(const string& block1, const string& block2) {
@@ -115,8 +117,9 @@ string breakVigenere(string ciphertext, string key) {
     return orig_text;
 }
 
-int main()
-{
+
+
+int main() {
 	string str = "This is my message";
 	string keyword = "Key";
 
