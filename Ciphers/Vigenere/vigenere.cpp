@@ -2,9 +2,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-// This function generates the key in
-// a cyclic manner until it's length isn't
-// equal to the length of original text
+// This function generates the key in a cyclic manner until it's length is equal to the length of original text
 string generateKey(string str, string key) {
     string generatedKey;
     int keyIndex = 0;
@@ -17,8 +15,7 @@ string generateKey(string str, string key) {
     return generatedKey;
 }
 
-// This function returns the encrypted text
-// generated with the help of the key
+// This function returns the encrypted text generated with the help of the key
 string cipherText(string str, string key) {
     string ciphertext;
 
@@ -30,8 +27,7 @@ string cipherText(string str, string key) {
     return ciphertext;
 }
 
-// This function decrypts the encrypted text
-// and returns the original text
+// This function decrypts the encrypted text and returns the original text
 string originalText(string ciphertext, string key) {
     string orig_text;
 
@@ -119,7 +115,6 @@ string breakVigenere(string ciphertext, string key) {
     return orig_text;
 }
 
-// Driver program to test the above function
 int main()
 {
 	string str = "This is my message";
