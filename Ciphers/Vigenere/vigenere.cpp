@@ -86,14 +86,13 @@ string ascii_to_binary(const string& text) {
 
 int getKeyLength(string ciphertext) {
     vector<int> lengths;
-    for (int i = 1; i < 41; i++) {
+    for (int i = 1; i < ciphertext.size(); i++) {
         lengths.push_back(i);
     }
 
     int keyLenCandidate;
     double minNormalized = 1e6;
     for (int keyLength : lengths) {
-        double totalHammingDistance = 0;
         double totalNormalizedDistance = 0;
 
         int numBlocks = ciphertext.length() / keyLength;
@@ -107,11 +106,9 @@ int getKeyLength(string ciphertext) {
             int hammingDistance = calculateHammingDistance(blockBinary, blockBinary2);
             double normalizedDistance = static_cast<double>(hammingDistance) / keyLength;
 
-            totalHammingDistance += hammingDistance;
             totalNormalizedDistance += normalizedDistance;
         }
 
-        double averageHammingDistance = totalHammingDistance / (numBlocks - 1);
         double averageNormalizedDistance = totalNormalizedDistance / (numBlocks - 1);
 
         if (averageNormalizedDistance < minNormalized){
