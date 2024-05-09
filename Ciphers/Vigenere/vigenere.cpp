@@ -68,8 +68,13 @@ string ascii_to_binary(const string& text) {
 }
 
 int getKeyLength(string ciphertext) {
+    int maxLen = 30;
+    if (ciphertext.size() < maxLen){
+        maxLen = ciphertext.size();
+    }
+
     vector<int> lengths;
-    for (int i = 1; i <= 10; i++) { // Try key lengths up to a certain limit, e.g., 10
+    for (int i = 1; i <= maxLen; i++) {
         lengths.push_back(i);
     }
 
