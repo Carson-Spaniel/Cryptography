@@ -5,58 +5,43 @@ using namespace std;
 // This function generates the key in
 // a cyclic manner until it's length isn't
 // equal to the length of original text
-string generateKey(string str, string key)
-{
-	int x = str.size();
-
-	for (int i = 0; ; i++)
-	{
-		if (x == i)
-			i = 0;
-		if (key.size() == str.size())
-			break;
-		key.push_back(key[i]);
-	}
-	return key;
+string generateKey(string str, string key) {
+    string generatedKey;
+    int keyIndex = 0;
+    for (char c : str) {
+        if (keyIndex == key.size()) {
+            keyIndex = 0; // Reset keyIndex to reuse the key
+        }
+        generatedKey.push_back(key[keyIndex++]);
+    }
+    return generatedKey;
 }
 
 // This function returns the encrypted text
 // generated with the help of the key
-string cipherText(string str, string key)
-{
-	string ciphertext;
+string cipherText(string str, string key) {
+    string ciphertext;
 
-	for (int i = 0; i < str.size(); i++)
-	{
-		// converting in range 0-25
-		char x = (str[i] + key[i]) %26;
+    for (int i = 0; i < str.size(); i++) {
+        char x = ((str[i] - 32 + key[i] - 32) % 95) + 32; // Adjust modulo and offset
 
-		// convert into alphabets(ASCII)
-		x += 'A';
-
-		ciphertext.push_back(x);
-	}
-	return ciphertext;
+        ciphertext.push_back(x);
+    }
+    return ciphertext;
 }
 
 // This function decrypts the encrypted text
 // and returns the original text
-string originalText(string ciphertext, string key)
-{
-	string orig_text;
+string originalText(string ciphertext, string key) {
+    string orig_text;
 
-	for (int i = 0 ; i < ciphertext.size(); i++)
-	{
-		// converting in range 0-25
-		char x = (ciphertext[i] - key[i] + 26) %26;
+    for (int i = 0; i < ciphertext.size(); i++) {
+        char x = ((ciphertext[i] - 32 - (key[i] - 32) + 95) % 95) + 32; // Adjust modulo and offset
 
-		// convert into alphabets(ASCII)
-		x += 'A';
-		orig_text.push_back(x);
-	}
-	return orig_text;
+        orig_text.push_back(x);
+    }
+    return orig_text;
 }
-
 
 /* Functions to break Vigenere */
 
@@ -86,7 +71,7 @@ string ascii_to_binary(const string& text) {
 
 int getKeyLength(string ciphertext) {
     vector<int> lengths;
-    for (int i = 1; i < ciphertext.size(); i++) {
+    for (int i = 1; i <= 10; i++) { // Try key lengths up to a certain limit, e.g., 10
         lengths.push_back(i);
     }
 
@@ -100,18 +85,21 @@ int getKeyLength(string ciphertext) {
             string block1 = ciphertext.substr(i * keyLength, keyLength);
             string block2 = ciphertext.substr((i + 1) * keyLength, keyLength);
 
-            string blockBinary = ascii_to_binary(block1);
-            string blockBinary2 = ascii_to_binary(block2);
+            // Calculate Hamming distance between block1 and block2
+            int hammingDistance = calculateHammingDistance(block1, block2);
 
-            int hammingDistance = calculateHammingDistance(blockBinary, blockBinary2);
+            // Normalize Hamming distance
             double normalizedDistance = static_cast<double>(hammingDistance) / keyLength;
 
+            // Accumulate normalized distances
             totalNormalizedDistance += normalizedDistance;
         }
 
+        // Calculate average normalized distance
         double averageNormalizedDistance = totalNormalizedDistance / (numBlocks - 1);
 
-        if (averageNormalizedDistance < minNormalized){
+        // Update candidate key length if average distance is smaller
+        if (averageNormalizedDistance < minNormalized) {
             keyLenCandidate = keyLength;
             minNormalized = averageNormalizedDistance;
         }
@@ -120,31 +108,27 @@ int getKeyLength(string ciphertext) {
     return keyLenCandidate;
 }
 
-string breakVigenere(string ciphertext, string key)
-{
-	string orig_text;
+string breakVigenere(string ciphertext, string key) {
+    string orig_text;
 
-	for (int i = 0; i < ciphertext.size(); i++)
-	{
-		// converting in range 0-25
-		char x = (ciphertext[i] + key[i]) %26;
+    for (int i = 0; i < ciphertext.size(); i++) {
+        char x = ((ciphertext[i] - 32 - (key[i] - 32) + 95) % 95) + 32; // Adjust modulo and offset
 
-		// convert into alphabets(ASCII)
-		x += 'A';
-
-		orig_text.push_back(x);
-	}
-	return orig_text;
+        orig_text.push_back(x);
+    }
+    return orig_text;
 }
 
 // Driver program to test the above function
 int main()
 {
-	string str = "GEEKSFORGEEKS";
-	string keyword = "KEY"; // The key cannot be longer than the text and has to be uppercase
+	string str = "This is my message";
+	string keyword = "This is my key that is long";
 
 	string key = generateKey(str, keyword);
 	string ciphertext = cipherText(str, key);
+
+    cout << "Key: " << key << "\n";
 
 	cout << "Ciphertext: " << ciphertext << "\n";
 
