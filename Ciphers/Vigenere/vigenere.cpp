@@ -118,7 +118,7 @@ string breakVigenere(string ciphertext, string key) {
 int main()
 {
 	string str = "This is my message";
-	string keyword = "This is my key that is long";
+	string keyword = "Key";
 
 	string key = generateKey(str, keyword);
 	string ciphertext = cipherText(str, key);
