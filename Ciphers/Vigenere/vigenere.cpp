@@ -1,5 +1,7 @@
 // C++ code to implement Vigenere Cipher
 #include<bits/stdc++.h>
+#include <algorithm>
+
 using namespace std;
 
 // This function generates the key in a cyclic manner until it's length is equal to the length of original text
@@ -29,14 +31,14 @@ string cipherText(string str, string key) {
 
 // This function decrypts the encrypted text and returns the original text
 string originalText(string ciphertext, string key) {
-    string orig_text;
+    string plaintext;
 
     for (int i = 0; i < ciphertext.size(); i++) {
         char x = ((ciphertext[i] - 32 - (key[i] - 32) + 95) % 95) + 32; // Adjust modulo and offset
 
-        orig_text.push_back(x);
+        plaintext.push_back(x);
     }
-    return orig_text;
+    return plaintext;
 }
 
 
@@ -55,16 +57,16 @@ int calculateHammingDistance(const string& block1, const string& block2) {
 }
 
 string ascii_to_binary(const string& text) {
-    string binary_result = "";
+    string binaryResult = "";
     for (char c : text) {
         // Convert each character to its ASCII value
-        int ascii_value = static_cast<int>(c);
+        int asciiValue = static_cast<int>(c);
         // Convert ASCII value to binary, format with 8 bits
-        string binary_value = bitset<8>(ascii_value).to_string();
+        string binaryValue = bitset<8>(asciiValue).to_string();
         // Append binary value to the result
-        binary_result += binary_value;
+        binaryResult += binaryValue;
     }
-    return binary_result;
+    return binaryResult;
 }
 
 int getKeyLength(string ciphertext) {
@@ -111,25 +113,81 @@ int getKeyLength(string ciphertext) {
     return keyLenCandidate;
 }
 
-string breakVigenere(string ciphertext, string key) {
-    string orig_text;
+int scoreText(std::string data) {
+    int s = 0;
+    std::transform(data.begin(), data.end(), data.begin(), ::tolower);
+    std::string common = "etaoin shrdlu";
 
-    for (int i = 0; i < ciphertext.size(); i++) {
-        char x = ((ciphertext[i] - 32 - (key[i] - 32) + 95) % 95) + 32; // Adjust modulo and offset
+    for (char c : data) {
+        if (!isprint(c) || common.find(tolower(c)) == std::string::npos) {
+            return 0; // Return 0 if the character is not in the common string
+        }
 
-        orig_text.push_back(x);
+        size_t i = common.find(tolower(c));
+        s += i;
     }
-    return orig_text;
+
+    return s;
 }
 
+void generateCombinations(string& currentKey, int index, int keyLength, string& ciphertext, string& plaintext, int& bestScore, string& bestKey) {
+    // Base case: if index reaches the length of the key, decrypt the ciphertext and update the plaintext and best score
+    if (index == keyLength) {
+
+        // cout << currentKey << "\n";
+
+        // Decrypt the ciphertext using the current key
+        string decryptedText = originalText(ciphertext, generateKey(ciphertext, currentKey));
+        if (currentKey == "key"){
+            cout << decryptedText << "\n";
+        }
+
+        // Score the decrypted text
+        int score = scoreText(decryptedText);
+
+        // Keep track of the best key based on the score
+        if (score > bestScore) {
+            bestScore = score;
+            plaintext = decryptedText;
+            bestKey = currentKey;
+        }
+        return;
+    }
+
+    // Loop through all possible characters from 'a' to 'Z' for the current index in the key
+    for (char ch = 'a'; ch <= 'z'; ++ch) {
+        // Set the current character in the key
+        currentKey[index] = ch;
+
+        // Recur for the next index
+        generateCombinations(currentKey, index + 1, keyLength, ciphertext, plaintext, bestScore, bestKey);
+    }
+}
+
+string breakVigenere(string ciphertext, int keyLength) {
+    string plaintext;
+    int bestScore = 0;
+    string bestKey;
+
+    // Initialize key with all 'a's
+    string currentKey(keyLength, 'a');
+
+    // Generate all combinations of letters for the key
+    generateCombinations(currentKey, 0, keyLength, ciphertext, plaintext, bestScore, bestKey);
+
+    cout << bestKey << "\n";
+
+    return plaintext;
+}
 
 
 int main() {
 	string str = "This is my message";
-	string keyword = "Key";
+	string keyword = "key";
 
 	string key = generateKey(str, keyword);
 	string ciphertext = cipherText(str, key);
+    int keyLength = getKeyLength(ciphertext);
 
     cout << "Key: " << key << "\n";
 
@@ -137,8 +195,8 @@ int main() {
 
 	cout << "Original/Decrypted Text: " << originalText(ciphertext, key) << "\n";
 
-    cout << "Found Possible Key length: " << getKeyLength(ciphertext) << "\n";
+    cout << "Found Possible Key length: " << keyLength << "\n";
 
-    cout << "Decrypted Broken Text: " << breakVigenere(ciphertext, "A");
+    cout << "Decrypted Broken Text: " << breakVigenere(ciphertext, keyLength);
 	return 0;
 }
