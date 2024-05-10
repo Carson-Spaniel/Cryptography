@@ -113,13 +113,14 @@ int getKeyLength(string ciphertext) {
     return keyLenCandidate;
 }
 
-int scoreText(std::string data) {
+int scoreText(string data) {
     int s = 0;
-    std::transform(data.begin(), data.end(), data.begin(), ::tolower);
-    std::string common = "etaoin shrdlu";
+    transform(data.begin(), data.end(), data.begin(), ::tolower);
+    string common = "etaoin shrdlu";
+    string alphabet = "abcdefghijklmnopqrstuvwxyz .";
 
     for (char c : data) {
-        if (!isprint(c) || common.find(tolower(c)) == std::string::npos) {
+        if (!isprint(c) || alphabet.find(tolower(c)) == string::npos) {
             return 0; // Return 0 if the character is not in the common string
         }
 
@@ -138,9 +139,6 @@ void generateCombinations(string& currentKey, int index, int keyLength, string& 
 
         // Decrypt the ciphertext using the current key
         string decryptedText = originalText(ciphertext, generateKey(ciphertext, currentKey));
-        if (currentKey == "key"){
-            cout << decryptedText << "\n";
-        }
 
         // Score the decrypted text
         int score = scoreText(decryptedText);
@@ -155,7 +153,7 @@ void generateCombinations(string& currentKey, int index, int keyLength, string& 
     }
 
     // Loop through all possible characters from 'a' to 'Z' for the current index in the key
-    for (char ch = 'a'; ch <= 'z'; ++ch) {
+    for (char ch = 'A'; ch <= 'z'; ++ch) {
         // Set the current character in the key
         currentKey[index] = ch;
 
@@ -175,7 +173,7 @@ string breakVigenere(string ciphertext, int keyLength) {
     // Generate all combinations of letters for the key
     generateCombinations(currentKey, 0, keyLength, ciphertext, plaintext, bestScore, bestKey);
 
-    cout << bestKey << "\n";
+    cout << "Best key: " << bestKey << "\n";
 
     return plaintext;
 }
@@ -183,7 +181,7 @@ string breakVigenere(string ciphertext, int keyLength) {
 
 int main() {
 	string str = "This is my message";
-	string keyword = "key";
+	string keyword = "Key";
 
 	string key = generateKey(str, keyword);
 	string ciphertext = cipherText(str, key);
