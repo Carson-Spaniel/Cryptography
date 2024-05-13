@@ -1,6 +1,5 @@
 // C++ code to implement Vigenere Cipher
 #include<bits/stdc++.h>
-#include <algorithm>
 
 using namespace std;
 
@@ -180,8 +179,8 @@ string breakVigenere(string ciphertext, int keyLength) {
 
 
 int main() {
-	string str = "This is my message";
-	string keyword = "Key";
+	string str = "Hello this is my full long message to encrypt using vigenere cipher";
+	string keyword = "key";
 
 	string key = generateKey(str, keyword);
 	string ciphertext = cipherText(str, key);
@@ -195,6 +194,6 @@ int main() {
 
     cout << "Found Possible Key length: " << keyLength << "\n";
 
-    cout << "Decrypted Broken Text: " << breakVigenere(ciphertext, keyLength);
+    cout << "Decrypted Broken Text: " << breakVigenere(ciphertext, keyLength/7) << "\n";
 	return 0;
 }
