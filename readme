@@ -40,6 +40,8 @@ Here, we need to detect encrypted data that was encrypted using AES in ECB mode.
 
 ## Cryptopals Set 2
 
+The Cryptopals Set 2 challenges build upon the concepts introduced in Set 1 and delve deeper into more advanced cryptographic topics, such as byte-level operations, block cipher modes, and padding schemes. This repository includes my solutions to these challenges, along with detailed explanations and documentation.
+
 ### Challenge 9: Implement PKCS#7 padding
 
 Implementing the PKCS#7 padding scheme, which is used to ensure that the plaintext data is a multiple of the block size for block cipher operations.
