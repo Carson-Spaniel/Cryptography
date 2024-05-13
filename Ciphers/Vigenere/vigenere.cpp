@@ -180,7 +180,7 @@ string breakVigenere(string ciphertext, int keyLength) {
 
 int main() {
 	string str = "Hello this is my full long message to encrypt using vigenere cipher";
-	string keyword = "key";
+	string keyword = "mykey";
 
 	string key = generateKey(str, keyword);
 	string ciphertext = cipherText(str, key);
@@ -194,7 +194,7 @@ int main() {
 
     cout << "Found Possible Key length: " << keyLength << "\n";
 
-    string brokenText = breakVigenere(ciphertext, keyLength/7);
+    string brokenText = breakVigenere(ciphertext, keyLength);
 
     cout << "Broken Text: " << brokenText << "\n";
 	return 0;
