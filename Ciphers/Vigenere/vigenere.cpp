@@ -190,10 +190,12 @@ int main() {
 
 	cout << "Ciphertext: " << ciphertext << "\n";
 
-	cout << "Original/Decrypted Text: " << originalText(ciphertext, key) << "\n";
+	cout << "Original Text: " << originalText(ciphertext, key) << "\n";
 
     cout << "Found Possible Key length: " << keyLength << "\n";
 
-    cout << "Decrypted Broken Text: " << breakVigenere(ciphertext, keyLength/7) << "\n";
+    string brokenText = breakVigenere(ciphertext, keyLength/7);
+
+    cout << "Broken Text: " << brokenText << "\n";
 	return 0;
 }
