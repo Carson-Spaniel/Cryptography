@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/carso/Github/Cryptography/Ciphers/subcipher",
-      "program": "c:/Users/carso/Github/Cryptography/Ciphers/subcipher/build/Debug/outDebug",
+      "cwd": "c:/Users/carso/Github/Cryptography/Ciphers/Vigenere",
+      "program": "c:/Users/carso/Github/Cryptography/Ciphers/Vigenere/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
