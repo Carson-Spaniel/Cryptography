@@ -4,7 +4,7 @@ This repository contains my solutions to the Cryptopals Set 1 cryptography chall
 
 ## Cryptopals Set 1
 
-The Cryptopals Set 1 challenges are designed to introduce and reinforce fundamental concepts in cryptography, such as bitwise operations, encoding schemes, and basic ciphers. This repository provides my solutions to each challenge, along with explanations and documentation.
+The Cryptopals Set 1 Challenges are designed to introduce and reinforce fundamental concepts in cryptography, such as bitwise operations, encoding schemes, and basic ciphers. This repository provides my solutions to each challenge, along with explanations and documentation.
 
 ### Challenge 1: Convert hex to base64
 
