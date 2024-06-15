@@ -180,7 +180,7 @@ string breakVigenere(string ciphertext, int keyLength) {
 
 int main() {
 	string str = "this is my message to encrypt using vigenere cipher";
-	string keyword = "two";
+	string keyword = "yes";
 
 	string key = generateKey(str, keyword);
 	string ciphertext = cipherText(str, key);
