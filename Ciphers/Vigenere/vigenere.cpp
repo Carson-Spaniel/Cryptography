@@ -179,8 +179,8 @@ string breakVigenere(string ciphertext, int keyLength) {
 
 
 int main() {
-	string str = "this is my message to encrypt using vigenere cipher";
-	string keyword = "yes";
+	string str = "this is my message encrypt using vigenere cipher";
+	string keyword = "my key";
 
 	string key = generateKey(str, keyword);
 	string ciphertext = cipherText(str, key);
