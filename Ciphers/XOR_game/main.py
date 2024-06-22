@@ -14,6 +14,7 @@ def play_game(quote, author, category):
             guessed.append('_')
         else:
             guessed.append(i)
+
     print("Welcome to the XOR Cipher Game!")
     print("Can you guess the original quote?")
     
@@ -31,6 +32,7 @@ def play_game(quote, author, category):
                 print(f'\033[32m{char}\033[0m', end='')
             else:
                 print(char, end='')
+                
         print('\n')
         print(f"Incorrect characters:\n{characterAttempted}\n")
         print(f"Correct characters:\n{correctCharacters}\n")
@@ -58,16 +60,19 @@ def play_game(quote, author, category):
                 guessed[i] = character
                 found = True
                 previousChar = character
+
         if found:
             print("Correct!")
             print('\n----------------------------------------------------')
             correctCharacters.append(character)
+
         else:
             print("Incorrect guess.")
             print('\n----------------------------------------------------')
             previousChar = ''
             incorrect +=1
             characterAttempted.append(character)
+
         if "_" not in guessed:
             print("\nCongratulations! You've guessed the entire quote!")
             print("Here's the original quote:")
