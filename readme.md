@@ -54,7 +54,7 @@ This section includes an implementation of the Advanced Encryption Standard (AES
 
 ### Vigenère Cipher
 
-The Vigenère cipher is a polyalphabetic substitution cipher that encrypts text by using a keyword to shift the letters of the plaintext.
+The Vigenère cipher is a polyalphabetic substitution cipher that encrypts text by using a keyword to shift the letters of the plaintext. The code implements this while also trying to break it. Breaking the code uses brute force.
 
 ### Caesar Cipher
 
