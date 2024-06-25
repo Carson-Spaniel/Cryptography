@@ -63,7 +63,7 @@ def caesarBreaker(cipherText):
 
         
 plainText = "hello my name is carson." # Works better with longer plain texts
-cipherText = caesarCipher(plainText,1)
+cipherText = caesarCipher(plainText,102)
 foundPlainText = caesarBreaker(cipherText)
 
 print(f'Plain text: {plainText}')
